@@ -1,0 +1,9 @@
+# npm
+node_modules/
+*.log
+*gz
+
+# Intellij & webStorm
+.idea/
+*.iml
+

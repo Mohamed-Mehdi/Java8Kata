@@ -7,6 +7,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
@@ -30,7 +32,7 @@ public class Exercise2Test {
         /**
          * Try to get from key "Alice" using {@link Map#getOrDefault}. If the key doesn't exist, use 30 as default.
          */
-        Integer defaultVal = null;
+        Integer defaultVal = map.getOrDefault("Alice", 30);
 
         assertThat(defaultVal, is(30));
     }
@@ -45,6 +47,8 @@ public class Exercise2Test {
          */
         // map.
         // map.
+        map.putIfAbsent("Alice", 32);
+        map.putIfAbsent("Joe", 32);
 
         assertThat(map.get("Alice"), is(32));
         assertThat(map.get("Joe"), is(22));
@@ -59,10 +63,12 @@ public class Exercise2Test {
          * Merge 2 entry to {@link map} with key="Alice" value=32, key="Joe" value=54 using {@link Map#merge}.
          * If the value already exist for the key, remap with sum value.
          */
-        BiFunction<Object, Object, Integer> remappingFunction = null;
+        BiFunction<Integer, Integer, Integer> remappingFunction = (a, b) -> a + b;
         // map.
         // map.
 
+        map.merge("Alice", 32, remappingFunction);
+        map.merge("Joe", 32, remappingFunction);
         assertThat(map.get("Alice"), is(32));
         assertThat(map.get("Joe"), is(54));
     }
@@ -75,10 +81,11 @@ public class Exercise2Test {
         /**
          * Try to increment the value for keys "Joe", "Steven" and "Alice" using {@link Map#computeIfPresent}.
          */
-        BiFunction<Object, Object, Integer> remappingFunction = null;
-        // map.
-        // map.
-        // map.
+        BiFunction<String, Integer, Integer> remappingFunction = (a, b) -> b+1;
+        map.computeIfPresent("Alice", remappingFunction);
+        map.computeIfPresent("Joe", remappingFunction);
+        map.computeIfPresent("Steven", remappingFunction);
+
 
         assertThat(map.get("Joe"), is(23));
         assertThat(map.get("Steven"), is(28));

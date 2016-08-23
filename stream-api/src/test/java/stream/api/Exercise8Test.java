@@ -8,8 +8,10 @@ import common.test.tool.entity.Shop;
 
 import org.junit.Test;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -60,18 +62,32 @@ public class Exercise8Test extends ClassicOnlineStore {
                 .flatMap(a -> a.getItemList().stream())
                 .collect(Collectors.toList());
 
+        Function<String, Integer> function = (a) -> {
+            try {
+                return onSale.stream()
+                        .filter(b -> b.getName().equals(a))
+                        .sorted(Comparator.comparing(Item::getPrice))
+                        .findFirst()
+                        .get()
+                        .getPrice();
+            } catch (Exception e) {
+                return 0;
+            }
+        };
+
         Predicate<Customer> havingEnoughMoney = a -> a.getBudget() >
                 a.getWantToBuy().stream()
-                        .filter(b -> onSale.contains(b))
-                        .mapToInt(b -> b.getPrice())
+                        .filter(item -> function.apply(item.getName()) != 0)
+                        .mapToInt(it -> function.apply(it.getName()))
                         .sum();
 
         List<String> customerNameList = customerStream
                 .filter(havingEnoughMoney)
-                .map(a -> a.getName())
+                .map(Customer::getName)
                 .collect(Collectors.toList());
 
         assertThat(customerNameList, hasSize(7));
         assertThat(customerNameList, hasItems("Joe", "Patrick", "Chris", "Kathy", "Alice", "Andrew", "Amy"));
     }
+
 }
